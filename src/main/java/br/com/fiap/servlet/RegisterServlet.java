@@ -1,7 +1,8 @@
 package br.com.fiap.servlet;
 
-import br.com.fiap.dao.CorrentistaDAO;
-import br.com.fiap.model.Correntista;
+import DAO.CorrentistaDAO;
+import DAO.DAOFactory;
+import models.Correntista;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.ServletException;
@@ -10,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 @WebServlet("/register")
@@ -39,7 +42,17 @@ public class RegisterServlet extends HttpServlet {
             correntista.setEndereco(endereco);
             correntista.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
             
-            CorrentistaDAO dao = new CorrentistaDAO(DAOFactory.getConnection());
+            CorrentistaDAO dao = new CorrentistaDAO(DAOFactory.getConnection()) {
+                @Override
+                public void update(Correntista entity) throws SQLException {}
+                @Override
+                public void delete(String id) throws SQLException {}
+                @Override
+                public Correntista findById(String id) throws SQLException { return null; }
+                @Override
+                public List<Correntista> findAll() throws SQLException { return null; }
+            };
+            
             dao.insert(correntista);
             
             response.sendRedirect(request.getContextPath() + "/login");

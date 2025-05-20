@@ -1,7 +1,8 @@
 package br.com.fiap.servlet;
 
-import br.com.fiap.dao.CorrentistaDAO;
-import br.com.fiap.model.Correntista;
+import DAO.CorrentistaDAO;
+import DAO.DAOFactory;
+import models.Correntista;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.ServletException;
@@ -28,7 +29,17 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         
         try {
-            CorrentistaDAO dao = new CorrentistaDAO(DAOFactory.getConnection());
+            CorrentistaDAO dao = new CorrentistaDAO(DAOFactory.getConnection()) {
+                @Override
+                public void update(Correntista entity) throws SQLException {}
+                @Override
+                public void delete(String id) throws SQLException {}
+                @Override
+                public Correntista findById(String id) throws SQLException { return null; }
+                @Override
+                public List<Correntista> findAll() throws SQLException { return null; }
+            };
+            
             Correntista correntista = dao.findByEmail(email);
             
             if (correntista != null && BCrypt.checkpw(password, correntista.getPassword())) {
